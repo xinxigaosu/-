@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>放学播报大屏</title>
+    <style>
+        body{font-size:40px;text-align:center;margin-top:50px;}
+        .info{color:blue;font-size:60px;margin:20px;}
+    </style>
+</head>
+<body>
+    <h1>🔔 学生离校播报</h1>
+    <div id="msg" class="info">等待刷卡...</div>
+
+    <script>
+        // 中文语音播报
+        function speak(text){
+            let u = new SpeechSynthesisUtterance(text);
+            u.lang = "zh-CN";
+            speechSynthesis.speak(u);
+        }
+
+        // 轮询获取最新记录
+        setInterval(()=>{
+            fetch("/rfid-last")
+            .then(r=>r.json())
+            .then(d=>{
+                if(d.data){
+                    let s = d.data;
+                    let txt = `${s.class} ${s.name} 已离校`;
+                    document.getElementById("msg").innerText = txt;
+                    speak(txt);
+                }
+            })
+        },2000);
+    </script>
+</body>
+</html>
